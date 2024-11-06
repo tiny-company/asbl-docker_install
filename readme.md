@@ -16,7 +16,7 @@ This repo contain the ansible role that configure docker for the servers
 ```
   - name: role_name
     scm: git
-    src: git@github.com:webdrone-infra/<repository_name>.git
+    src: git@github.com:tiny-company/<repository_name>.git
     version: main
 ```
 
@@ -27,7 +27,7 @@ ansible-galaxy install -r requirements.yml
 
 - Or manually get the playbook as collection (with ansible-galaxy) :
 ```
-ansible-galaxy collection install git@github.com:webdrone-infra/<repository_name>.git
+ansible-galaxy collection install git@github.com:tiny-company/<repository_name>.git
 ```
 
 ### Variables

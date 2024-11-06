@@ -18,7 +18,7 @@
     name: overlay
     state: present
     params: 'permit_mounts_in_userns=1'
-  when: ansible_kernel |  version_compare('5.11','>')
+  when: ansible_kernel is version_compare('5.11','>')
 
 # # ----------------------------------------------------------------
 
