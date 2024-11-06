@@ -1,0 +1,19 @@
+---
+# Description : configure docker hub ids
+# file : _set_docker_hub.yml
+# source : https://docs.ansible.com/ansible/latest/collections/community/docker/docker_login_module.html
+
+- name: assert docker registry credentials are defined
+  ansible.builtin.assert:
+    that:
+      - "dockerhub_username is defined and dockerhub_username|length > 0"
+      - "dockerhub_password is defined and dockerhub_password|length > 0"
+    fail_msg: "'dockerhub_username' or 'dockerhub_password' vars is empty"
+
+- name: Log into docker registry and force re-authorization
+  community.docker.docker_login:
+    registry_url: "{{ dockerl_registry_url }}"
+    username: "{{ dockerhub_username }}"
+    password: "{{ dockerhub_password }}"
+    reauthorize: true
+  when: docker_user and dockerhub_password

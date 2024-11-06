@@ -1,0 +1,35 @@
+---
+# Description : configure docker user and group
+# file : _docker_user_creation.yml
+
+- name: Checking if user name and group vars are defined
+  ansible.builtin.assert:
+    that:
+      - docker_user|length > 0
+      - docker_group_name|length > 0
+    fail_msg: "'docker_user' or 'docker_group_name' vars is empty"
+    success_msg: "'docker_user' is {{ docker_user }} and 'docker_group_name' is {{ docker_group_name }}"
+
+- name: Ensure groups exists and add them if not
+  ansible.builtin.group:
+    name: "{{ docker_group_name }}"
+    state: present
+  when: docker_group_name is defined
+
+- name: create the docker user
+  ansible.builtin.user:
+    name: "{{ docker_user }}"
+    groups: "{{ docker_group_name }}"
+    state: present
+  when: docker_user is defined and docker_group_name is defined
+
+- name: create the docker user with low priviledge
+  ansible.builtin.user:
+    name: "{{ low_pri_docker_user.name }}"
+    group: "{{ low_pri_docker_user.group }}"
+    uid: "{{ low_pri_docker_user.uid }}"
+    state: present
+  when: low_pri_docker_user is defined
+
+- name: Reset ssh connection to allow user changes to affect 'current login user'
+  ansible.builtin.meta: reset_connection

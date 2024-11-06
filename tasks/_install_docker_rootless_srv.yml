@@ -1,0 +1,64 @@
+---
+# Description : configure docker service in rootless mode
+# file : _docker_rootfull_srv.yml
+# from : https://docs.docker.com/engine/security/rootless/
+# from : https://docs.docker.com/engine/install/debian/
+
+# For Debian 10 (rootless prerequistes)
+- name: configure kernel.unprivileged_userns_clone in /etc/sysctl.conf
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.conf
+    regexp: '^kernel.unprivileged_userns_clone='
+    line: kernel.unprivileged_userns_clone=1
+  when: ansible_distribution == 'Debian' and ansible_distribution_version <= '10'
+
+## only kernel version greater than 5.11 in order to prevent non stable behaviour
+- name: Using overlay2 storage driver with Debian-specific modprobe
+  community.general.modprobe:
+    name: overlay
+    state: present
+    params: 'permit_mounts_in_userns=1'
+  when: ansible_kernel |  version_compare('5.11','>')
+
+# # ----------------------------------------------------------------
+
+# install docker rootles with script
+# see : https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script
+- name: install docker CE rootless with script
+  block:
+
+  - name: Create the script destination directory if it does not exist
+    ansible.builtin.file:
+      path: "/home/{{ docker_user }}/downloads"
+      state: directory
+      mode: '0755'
+
+  - name: Get the script
+    ansible.builtin.get_url:
+      url: https://get.docker.com/rootless
+      dest: "/home/{{ docker_user }}/downloads/docker_rootless.sh"
+      checksum: sha512:aff814ce5b83ebe74c020b9ab0c0a376651dadae6763c54f35a1a57ce42d6e9aefe61412b4c7a03a8244f151958a75d6354e259a15f541b3b7bcee83d35a3f58
+      mode: '0700'
+
+  - name: launch the script
+    ansible.builtin.shell: "/home/{{ docker_user }}/downloads/docker_rootless.sh"
+# ----------------------------------------------------------------
+
+# install docker rootless from apt repo
+# see : https://docs.docker.com/engine/security/rootless/
+# package will auto detect the package manager module (apt, yum, etc ...)
+# - name: Install the desired package from packages_list
+#   ansible.builtin.package:
+#     name: "{{ docker_packages_list }}"
+#     state: present
+
+- name: make docker daemon start at login
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: yes
+    scope: user
+
+- name: configure docker client for (this) the server
+  ansible.builtin.shell: "export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock"
+  notify: restart sshd

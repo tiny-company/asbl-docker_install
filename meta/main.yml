@@ -1,0 +1,32 @@
+galaxy_info:
+  role_name: docker_install
+  author: infrastructure
+  description: This repo contain the ansible role that configure docker for the server
+  company: webdrone
+  license: license GPL-3.0-only
+  min_ansible_version: 2.14.1
+
+## installing docker packages dependencies
+dependencies:
+  - role: apt_packages_install
+    become: true
+    become_user: root
+    vars:
+      apt_repo_key:
+        - {"url" : "https://download.docker.com/linux/debian/gpg", "dest" : "/etc/apt/keyrings/docker.asc"}
+      apt_repo:
+        - {"url" : "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable" , "filename" : "docker-ce"}
+      apt_source_package_list:
+        - uidmap
+        - dbus-user-session
+        - fuse-overlayfs
+        - slirp4netns
+        - git
+        - git-man
+        - libcurl3-gnutls
+        - liberror-perl
+        - libltdl7
+        - docker-scan-plugin
+        - docker-ce-rootless-extras
+        - gnupg2
+        - pass

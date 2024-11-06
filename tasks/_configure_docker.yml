@@ -1,0 +1,37 @@
+---
+# Description : configure docker service in rootless mode
+# file : _docker_rootfull_srv.yml
+# from : https://github.com/mullholland/ansible-role-docker/blob/main/tasks/configure.yml
+
+- name: configure | Create Docker ENV folder
+  ansible.builtin.file:
+    path: "{{ docker_opts_path }}"
+    state: directory
+    owner: "{{ docker_user }}"
+    group: "{{ docker_user }}"
+    mode: "0755"
+
+- name: Configure Docker daemon options.
+  copy:
+    content: "{{ docker_daemon_options | to_nice_json }}"
+    dest: /etc/docker/daemon.json
+    mode: 0644
+  when: docker_daemon_options.keys() | length > 0
+  notify: restart docker
+
+# - name: Create docker daemon config file
+#   ansible.builtin.template:
+#     src: "docker/env.j2"
+#     dest: "{{ docker_opts_path }}/daemon.json"
+#     mode: "0644"
+#     owner: "{{ docker_user }}"
+#     group: "{{ docker_user }}"
+#   notify: restart docker
+
+- name: configure | Adding existing user to docker group"
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: "docker"
+    append: true
+  with_items: "{{ docker_add_users }}"
+  when: docker_add_users is iterable

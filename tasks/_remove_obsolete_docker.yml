@@ -1,0 +1,26 @@
+---
+# Description : remove old obsoletes docker packages
+# file : _remove_obsolete_docker.yml
+# from : https://docs.docker.com/engine/install/debian/#uninstall-old-versions
+
+- name: Make sure old docker instance are stopped and disabled
+  ansible.builtin.systemd:
+    name: docker
+    state: stopped
+    enabled: no
+  ignore_errors: True
+
+# if any instance of docker is running kill it 
+# sudo systemctl disable --now docker.service docker.socket
+- name: disable previous docker.service and docker.socket
+  ansible.builtin.command: systemctl disable --now docker.service docker.socket
+  ignore_errors: True
+
+# remove old docker package if exist
+# apt-get remove docker docker-engine docker.io containerd runc
+- name: Make sure old docker package are remove (with apt)
+  ansible.builtin.apt:
+    name: "{{ docker_packages_obsolete_list }}"
+    state: absent
+    autoremove: yes
+    autoclean: yes

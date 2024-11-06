@@ -1,0 +1,73 @@
+---
+
+###################################################
+## docker_install role vars
+###################################################
+
+## root username (default is root)
+root_user: root
+
+## user to run this playbook
+docker_install_user: ansible
+
+## ==================
+## remove obsolete docker package
+docker_packages_obsolete_list:
+  - docker
+  - docker-engine
+  - docker.io
+  - containerd
+  - runc
+
+## ==================
+## docker user creation
+docker_user: docker
+docker_group_name: docker
+
+## ==================
+## docker user  (low priviledge) creation
+low_pri_docker_user_name: docker_user
+low_pri_docker_user: {
+  name: "{{ low_pri_docker_user_name }}",
+  uid: "2002",
+  group: "{{ low_pri_docker_user_name }}",
+}
+
+## ==================
+## docker rootful or rootless
+## default install secure rootless docker
+## set to true to install rootfull docker (unsecure but better for testing)
+docker_rootfull_mode: true
+
+## ==================
+## docker installation
+
+## user "apt-cache madison docker-ce" to have available version
+docker_ce_package_version: "5:24.0.7-1"
+docker_version: "{{ docker_ce_package_version }}~debian.{{ ansible_distribution_major_version }}~{{ ansible_distribution_release }}"
+docker_packages_list:
+  - docker-ce={{ docker_version }}
+  - docker-ce-cli={{ docker_version }}
+  - containerd.io
+
+## ==================
+## docker configuration
+docker_opts_path: "/etc/docker"
+docker_data_root: "/var/lib/docker"
+# If you want to specify any docker options this variable has to be a list:
+docker_daemon_options: {
+  "userns-remap": "{{ low_pri_docker_user_name }}:{{ low_pri_docker_user_name }}" #,
+  # "dns" : "{{ ansible_docker0.ipv4.address }}",
+  # "insecure-registry" : "myregistrydomain.com:5000"
+}
+
+
+docker_add_users:
+  - ansible
+
+## ==================
+## dockerhub vars
+docker_set_dockerhub: false
+dockerl_registry_url: "https://index.docker.io/v1/"
+dockerhub_username: ''
+dockerhub_password: ''

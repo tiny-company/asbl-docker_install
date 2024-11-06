@@ -1,0 +1,9 @@
+---
+
+- name: Install docker playbook
+  hosts: all
+  roles:
+    - role: docker_install
+      become: true
+      become_user: "{{ docker_install_user }}"
+      tags: [docker_install]

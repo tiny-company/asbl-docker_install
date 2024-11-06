@@ -1,0 +1,48 @@
+---
+# Description : install and configure docker service
+# file : main.yml
+
+# delete old obsoletes packages
+- import_tasks: _remove_obsolete_docker.yml
+  become: true
+  become_user: "{{ root_user }}"
+  tags: [_set_docker_hub]
+  when: docker_set_dockerhub
+
+# create docker user
+- import_tasks: _docker_user_creation.yml
+  become: true
+  become_user: "{{ root_user }}"
+  tags: [_docker_user_creation]
+
+- name: Creates docker data root path
+  become: true
+  become_user: "{{ root_user }}"
+  ansible.builtin.file:
+    path: "{{ docker_data_root }}"
+    state: directory
+
+# install docker in root mode (unsecure but better for testing)
+- import_tasks: _install_docker_rootfull_srv.yml
+  become: true
+  become_user: "{{ root_user }}"
+  tags: [_docker_rootfull_srv]
+  when: docker_rootfull_mode
+
+# install docker in rootless mode (secure, use for prod env)
+- import_tasks: _install_docker_rootless_srv.yml
+  become: true
+  become_user: "{{ docker_install_user }}"
+  tags: [_docker_rootless_srv]
+  when: not docker_rootfull_mode
+
+# configure docker
+- import_tasks: _configure_docker.yml
+  become: true
+  become_user: "{{ root_user }}"
+  tags: [_configure_docker]
+
+# configure dockerhub ids
+- import_tasks: _set_docker_hub.yml
+  tags: [_set_docker_hub]
+  when: docker_set_dockerhub

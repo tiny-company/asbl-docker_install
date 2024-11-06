@@ -1,0 +1,14 @@
+---
+- name: restart sshd
+  become: true
+  become_user: "{{ root_user }}"
+  ansible.builtin.service:
+    name: ssh
+    state: restarted
+
+- name: restart docker
+  become: true
+  become_user: "{{ root_user }}"
+  ansible.builtin.service:
+    name: docker
+    state: restarted
