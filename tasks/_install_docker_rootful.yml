@@ -22,7 +22,7 @@
     owner: "{{ root_user }}"
     group: "{{ root_user }}"
     mode: "0644"
-  when: docker_version | d()
+  when: docker_version is defined
 
 - name: Enable pinned Docker Compose v2 version
   ansible.builtin.template:
@@ -31,16 +31,16 @@
     owner: "{{ root_user }}"
     group: "{{ root_user }}"
     mode: "0644"
-  when: docker_compose_v2_version | d()
+  when: docker_compose_v2_version is defined
 
 - name: Install docker package prerequisites
-  include_role:
+  ansible.builtin.include_role:
     name: apt_packages_install
     vars:
       apt_source_package_list: "{{ docker_package_dependencies + docker_pip_dependencies }}"
 
 - name: Install Docker and Docker Compose v2
-  include_role:
+  ansible.builtin.include_role:
     name: apt_packages_install
     vars:
       apt_repo_key: "{{ docker_apt_repo_key }}"
