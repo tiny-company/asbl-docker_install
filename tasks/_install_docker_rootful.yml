@@ -34,12 +34,16 @@
   when: docker_compose_v2_version is defined
 
 - name: Install docker package prerequisites
+  become: true
+  become_user: root
   ansible.builtin.include_role:
     name: apt_packages_install
     vars:
       apt_source_package_list: "{{ docker_package_dependencies + docker_pip_dependencies }}"
 
 - name: Install Docker and Docker Compose v2
+  become: true
+  become_user: root
   ansible.builtin.include_role:
     name: apt_packages_install
     vars:
