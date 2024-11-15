@@ -28,8 +28,8 @@
     name: "{{ item }}"
     groups: "{{ docker_group_name }}"
     append: true
-  loop: "{{ docker_add_users }}"
-  when: docker_add_users is iterable
+  loop: "{{ docker_group_add_users }}"
+  when: docker_group_add_users is iterable
 
 - name: Reset ssh connection to allow user changes to affect 'current login user'
   ansible.builtin.meta: reset_connection
