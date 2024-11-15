@@ -8,7 +8,7 @@
 root_user: root
 
 ## user to run this playbook
-docker_install_user: ansible
+docker_install_user: root
 
 ## ==================
 ## remove obsolete docker package
@@ -52,6 +52,12 @@ docker_package_dependencies:
   - curl
   - dbus-user-session
   - gnupg2
+  - git
+  - git-man
+  - libcurl3-gnutls
+  - liberror-perl
+  - libltdl7
+  - pass
 
 docker_packages_list:
   - docker-ce
