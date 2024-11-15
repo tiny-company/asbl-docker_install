@@ -61,4 +61,6 @@
 # setting docker cron job
 - import_tasks: _set_docker_cronjob.yml
   tags: [_set_docker_cronjob]
-  when: _set_docker_cronjob
+  when:
+    - docker_cron_jobs is defined
+    - docker_cron_jobs is iterable
