@@ -1,0 +1,33 @@
+---
+# Description : configure docker service in rootless mode
+# file : _configure_python_docker.yml
+# from : https://github.com/nickjj/ansible-docker/blob/master/tasks/main.yml
+
+- name: Install Python packages
+  ansible.builtin.pip:
+    name: >
+      {{ item.name }}{% if item.version | d() %}=={{ item.version }}{% endif %}
+    virtualenv: "{{ docker_pip_virtualenv }}"
+    virtualenv_python: "python3"
+    state: "{{ item.state | d('present') }}"
+  loop: "{{ docker_default_pip_packages + docker_pip_packages }}"
+  when: item.name | d()
+
+- name: Create python3-docker proxy script to access Virtualenv's interpreter
+  ansible.builtin.template:
+    src: "usr/local/bin/python3-docker.j2"
+    dest: "/usr/local/bin/python3-docker"
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+    mode: "0755"
+
+- name: Symlink selected Python package binaries to /usr/local/bin
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    src: "{{ item.src }}"
+    force: true
+    state: "link"
+  loop: "{{ docker_default_pip_packages + docker_pip_packages }}"
+  when:
+    - item.state | d("present") != "absent"
+    - item.path | d() and item.src | d()

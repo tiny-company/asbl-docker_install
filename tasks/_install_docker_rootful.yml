@@ -1,0 +1,48 @@
+---
+# Description : install docker in rootless mode
+# file : _docker_install_rootful.yml
+# from : https://docs.docker.com/engine/install/debian/
+
+- name: Disable pinned Docker version
+  ansible.builtin.file:
+    dest: "/etc/apt/preferences.d/docker.pref"
+    state: "absent"
+  when: not docker_version | d()
+
+- name: Disable pinned Docker Compose v2 version
+  ansible.builtin.file:
+    dest: "/etc/apt/preferences.d/docker-compose-plugin.pref"
+    state: "absent"
+  when: not docker_compose_v2_version | d()
+
+- name: Enable pinned Docker version
+  ansible.builtin.template:
+    src: "etc/apt/preferences.d/docker.pref.j2"
+    dest: "/etc/apt/preferences.d/docker.pref"
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+    mode: "0644"
+  when: docker_version | d()
+
+- name: Enable pinned Docker Compose v2 version
+  ansible.builtin.template:
+    src: "etc/apt/preferences.d/docker-compose-plugin.pref.j2"
+    dest: "/etc/apt/preferences.d/docker-compose-plugin.pref"
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+    mode: "0644"
+  when: docker_compose_v2_version | d()
+
+- name: Install docker package prerequisites
+  include_role:
+    name: apt_packages_install
+    vars:
+      apt_source_package_list: "{{ docker_package_dependencies + docker_pip_dependencies }}"
+
+- name: Install Docker and Docker Compose v2
+  include_role:
+    name: apt_packages_install
+    vars:
+      apt_repo_key: "{{ docker_apt_repo_key }}"
+      apt_repo: "{{ docker_apt_repo }}"
+      apt_source_package_list: "{{ docker_packages_list }}"

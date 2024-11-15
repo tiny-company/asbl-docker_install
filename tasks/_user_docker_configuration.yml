@@ -23,13 +23,14 @@
     state: present
   when: docker_user is defined and docker_group_name is defined
 
-- name: create the docker user with low priviledge
+- name: Adding existing user to docker group
   ansible.builtin.user:
-    name: "{{ low_pri_docker_user.name }}"
-    group: "{{ low_pri_docker_user.group }}"
-    uid: "{{ low_pri_docker_user.uid }}"
-    state: present
-  when: low_pri_docker_user is defined
+    name: "{{ item }}"
+    groups: "{{ docker_group_name }}"
+    append: true
+  loop: "{{ docker_add_users }}"
+  when: docker_add_users is iterable
 
 - name: Reset ssh connection to allow user changes to affect 'current login user'
   ansible.builtin.meta: reset_connection
+

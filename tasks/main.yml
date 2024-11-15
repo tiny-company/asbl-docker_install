@@ -2,18 +2,12 @@
 # Description : install and configure docker service
 # file : main.yml
 
-# delete old obsoletes packages
+## delete old obsoletes packages
 - import_tasks: _remove_obsolete_docker.yml
   become: true
   become_user: "{{ root_user }}"
-  tags: [_set_docker_hub]
+  tags: [_remove_obsolete_docker]
   when: docker_set_dockerhub
-
-# create docker user
-- import_tasks: _docker_user_creation.yml
-  become: true
-  become_user: "{{ root_user }}"
-  tags: [_docker_user_creation]
 
 - name: Creates docker data root path
   become: true
@@ -22,27 +16,49 @@
     path: "{{ docker_data_root }}"
     state: directory
 
-# install docker in root mode (unsecure but better for testing)
-- import_tasks: _install_docker_rootfull_srv.yml
+## docker rootfull
+- name: Install and configure rootful Docker
   become: true
   become_user: "{{ root_user }}"
-  tags: [_docker_rootfull_srv]
-  when: docker_rootfull_mode
+  ansible.builtin.import_tasks:
+    file: _install_docker_rootful.yml
+  tags: [_install_docker_rootful]
+  when: docker_rootfull
 
-# install docker in rootless mode (secure, use for prod env)
-- import_tasks: _install_docker_rootless_srv.yml
+## docker rootless
+# - name: Install and configure rootless Docker
+#   ansible.builtin.import_tasks:
+#     file: _docker_install_rootless.yml
+#   tags: [_docker_rootless]
+#   when: not docker_rootfull
+
+- name: configure python with docker
+  ansible.builtin.import_tasks:
+    file: _configure_python_docker.yml
+  tags: [_configure_python_docker]
+
+# create docker user
+- name: configure docker user and group
   become: true
-  become_user: "{{ docker_install_user }}"
-  tags: [_docker_rootless_srv]
-  when: not docker_rootfull_mode
+  become_user: "{{ root_user }}"
+  ansible.builtin.import_tasks:
+    file: _user_docker_configuration.yml
+  tags: [_user_docker_configuration]
 
 # configure docker
-- import_tasks: _configure_docker.yml
+- name: configure docker daemon
   become: true
   become_user: "{{ root_user }}"
+  ansible.builtin.import_tasks:
+    file: _configure_docker.yml
   tags: [_configure_docker]
 
 # configure dockerhub ids
 - import_tasks: _set_docker_hub.yml
   tags: [_set_docker_hub]
   when: docker_set_dockerhub
+
+# setting docker cron job
+- import_tasks: _set_docker_cronjob.yml
+  tags: [_set_docker_cronjob]
+  when: _set_docker_cronjob

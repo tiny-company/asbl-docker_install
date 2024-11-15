@@ -1,0 +1,115 @@
+---
+# Description : configure docker service in rootless mode
+# file : _install_docker_rootless.yml
+# from : https://github.com/konstruktoid/ansible-role-docker-rootless/blob/main/tasks/pre.yml
+
+## debian version 10 or previous failure information
+- name: Debian information 10
+  ansible.builtin.fail:
+    msg: slirp4netns (>= 0.4.0) is required, currently not available in Debian <= 10
+  when:
+    - docker_rootful
+    - (ansible_distribution == "Debian" and ansible_distribution_major_version <= '10')
+
+- name: Install docker rootless package prerequisites
+  include_role:
+    name: apt_packages_install
+  vars:
+    apt_source_package_list:
+      - acl
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - dbus-user-session
+      - gnupg
+      - iptables
+      - libpam-systemd
+      - lsb-release
+      - python3-docker
+      - python3-pexpect
+      - python3-pip
+      - python3-six
+      - slirp4netns
+      - uidmap
+
+
+## install docker rootless feature : fuse-overlay
+- name: Install fuse-overlayfs
+  include_role:
+    name: apt_packages_install
+  vars:
+    apt_source_package_list:
+      - fuse-overlayfs
+  when: >
+    ansible_distribution == "Debian" and
+    (ansible_kernel is version("4.18", ">=") and
+    ansible_kernel is version("5.11", "<="))
+
+## activate rooting
+- name: Sysctl net.ipv4.ip_forward
+  become: true
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    sysctl_set: true
+    state: present
+    reload: true
+
+## activate userns clone
+- name: Sysctl kernel.unprivileged_userns_clone
+  become: true
+  ansible.posix.sysctl:
+    name: kernel.unprivileged_userns_clone
+    value: "1"
+    sysctl_set: true
+    state: present
+    reload: true
+  when:
+    - ansible_distribution == "Debian"
+    - (ansible_distribution_version | int != 0  and ansible_distribution_version is version('11', '<'))
+
+## activate priviledge port usage as docker rootless
+- name: Sysctl net.ipv4.ip_unprivileged_port_start=0
+  become: true
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_unprivileged_port_start
+    value: "0"
+    sysctl_set: true
+    state: present
+    reload: true
+  when:
+    - docker_allow_privileged_ports
+
+## activate ping for docker rootless container
+- name: Sysctl net.ipv4.ping_group_range=0 2147483647
+  become: true
+  ansible.posix.sysctl:
+    name: net.ipv4.ping_group_range
+    value: 0 2147483647
+    sysctl_set: true
+    state: present
+    reload: true
+  when:
+    - docker_allow_ping
+
+- name: Sysctl user.max_user_namespaces=28633
+  become: true
+  ansible.posix.sysctl:
+    name: user.max_user_namespaces
+    value: "28633"
+    sysctl_set: true
+    state: present
+    reload: true
+  when:
+    - not docker_rootful
+
+## only kernel version greater than 5.11 in order to prevent non stable behaviour
+- name: Using overlay2 storage driver with Debian-specific modprobe
+  become: true
+  community.general.modprobe:
+    name: overlay
+    state: present
+    params: permit_mounts_in_userns=1
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_kernel is version_compare('5.11','>')

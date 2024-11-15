@@ -2,7 +2,11 @@
 
 ## Description
 
-This repo contain the ansible role that configure docker for the servers
+This repo contain the ansible role that configure docker and docker-compose for the servers.
+- install docker (rootless or rootfull) and docker compose (docker compose version 1 or 2).
+- install docker pip package to be compatible with ansible's docker module.
+- Manage user and group related to docker.
+- Configure docker daemon.
 
 ## Prerequisite
 
@@ -39,6 +43,8 @@ purposes and by the default value you can tell the type.
 
 ## Source :
 
+- [nickjj docker role](https://github.com/nickjj/ansible-docker/tree/master)
 - [mullholand docker role](https://github.com/mullholland/ansible-role-docker)
 - [ansible docker_login module](https://docs.ansible.com/ansible/latest/collections/community/docker/docker_login_module.html)
-
+- [docker rootless install guide](https://docs.docker.com/engine/security/rootless/)
+- [docker classic install guide](https://docs.docker.com/engine/install/debian/)

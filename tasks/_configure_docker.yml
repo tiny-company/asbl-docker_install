@@ -2,36 +2,51 @@
 # Description : configure docker service in rootless mode
 # file : _docker_rootfull_srv.yml
 # from : https://github.com/mullholland/ansible-role-docker/blob/main/tasks/configure.yml
+# from : https://github.com/nickjj/ansible-docker/blob/master/tasks/main.yml
 
-- name: configure | Create Docker ENV folder
+- name: Create Docker configuration directories
   ansible.builtin.file:
-    path: "{{ docker_opts_path }}"
-    state: directory
-    owner: "{{ docker_user }}"
-    group: "{{ docker_user }}"
+    path: "{{ item }}"
+    state: "directory"
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
     mode: "0755"
+  loop: "{{ docker_opts_path }}"
 
-- name: Configure Docker daemon options.
-  copy:
-    content: "{{ docker_daemon_options | to_nice_json }}"
-    dest: /etc/docker/daemon.json
-    mode: 0644
-  when: docker_daemon_options.keys() | length > 0
-  notify: restart docker
+- name: Configure Docker daemon options (json)
+  ansible.builtin.template:
+    src: "etc/docker/daemon.json.j2"
+    dest: "/etc/docker/daemon.json"
+    backup: true
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+    mode: "0644"
+    validate: dockerd --validate --config-file %s
+  notify: ["restart docker"]
 
-# - name: Create docker daemon config file
-#   ansible.builtin.template:
-#     src: "docker/env.j2"
-#     dest: "{{ docker_opts_path }}/daemon.json"
-#     mode: "0644"
-#     owner: "{{ docker_user }}"
-#     group: "{{ docker_user }}"
-#   notify: restart docker
+- name: Configure Docker daemon options (flags)
+  ansible.builtin.template:
+    src: "etc/systemd/system/docker.service.d/options.conf.j2"
+    dest: "/etc/systemd/system/docker.service.d/options.conf"
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+    mode: "0644"
+  notify: ["Reload systemd daemon", "restart docker"]
 
-- name: configure | Adding existing user to docker group"
-  ansible.builtin.user:
-    name: "{{ item }}"
-    groups: "docker"
-    append: true
-  with_items: "{{ docker_add_users }}"
-  when: docker_add_users is iterable
+- name: Configure Docker daemon environment variables
+  ansible.builtin.template:
+    src: "etc/systemd/system/docker.service.d/environment.conf.j2"
+    dest: "/etc/systemd/system/docker.service.d/environment.conf"
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+    mode: "0644"
+  notify: ["Reload systemd daemon", "restart docker"]
+
+- name: Configure custom systemd unit file override
+  ansible.builtin.template:
+    src: "etc/systemd/system/docker.service.d/custom.conf.j2"
+    dest: "/etc/systemd/system/docker.service.d/custom.conf"
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+    mode: "0644"
+  notify: ["Reload systemd daemon", "restart docker"]

@@ -10,7 +10,7 @@
     enabled: no
   ignore_errors: True
 
-# if any instance of docker is running kill it 
+# if any instance of docker is running kill it
 # sudo systemctl disable --now docker.service docker.socket
 - name: disable previous docker.service and docker.socket
   ansible.builtin.command: systemctl disable --now docker.service docker.socket

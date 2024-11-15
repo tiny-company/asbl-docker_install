@@ -3,16 +3,15 @@
 roles:
   - name: docker_install
     scm: git
-    src: git@github.com:webdrone-infra/asbl-docker_install.git
+    src: https://github.com/tiny-company/asbl-docker_install.git
     version: main
 
   - name: apt_packages_install
     scm: git
-    src: https://github.com/webdrone-infra/asbl-apt_packages_install.git
+    src: https://github.com/tiny-company/asbl-apt_packages_install.git
     version: main
 
 collections:
-  - name: scaleway.scaleway
   - name: community.general
   - name: ansible.posix
 
