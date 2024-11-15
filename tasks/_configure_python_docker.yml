@@ -14,6 +14,8 @@
   when: item.name | d()
 
 - name: Create python3-docker proxy script to access Virtualenv's interpreter
+  become: true
+  become_user: "{{ root_user }}"
   ansible.builtin.template:
     src: "usr/local/bin/python3-docker.j2"
     dest: "/usr/local/bin/python3-docker"
@@ -22,6 +24,8 @@
     mode: "0755"
 
 - name: Symlink selected Python package binaries to /usr/local/bin
+  become: true
+  become_user: "{{ root_user }}"
   ansible.builtin.file:
     path: "{{ item.path }}"
     src: "{{ item.src }}"

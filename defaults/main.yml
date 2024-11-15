@@ -8,7 +8,7 @@
 root_user: root
 
 ## user to run this playbook
-docker_install_user: root
+docker_install_user: admin
 
 ## ==================
 ## remove obsolete docker package
