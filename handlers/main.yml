@@ -14,5 +14,7 @@
     state: restarted
 
 - name: Reload systemd daemon
+  become: true
+  become_user: "{{ root_user }}"
   ansible.builtin.systemd:
     daemon_reload: true
