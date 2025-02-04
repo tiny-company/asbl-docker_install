@@ -21,5 +21,3 @@
   when: item.username | d() and item.password | d()
   become: true
   become_user: "{{ docker__login_become_user | d('root') }}"
-  vars:
-    ansible_python_interpreter: "{{ '/usr/local/bin/python3-docker' }}"
