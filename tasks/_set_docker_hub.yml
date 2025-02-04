@@ -4,13 +4,6 @@
 # source : https://docs.ansible.com/ansible/latest/collections/community/docker/docker_login_module.html
 # from : https://github.com/nickjj/ansible-docker/blob/master/tasks/main.yml
 
-- name: assert docker registry credentials are defined
-  ansible.builtin.assert:
-    that:
-      - "dockerhub_username is defined and dockerhub_username|length > 0"
-      - "dockerhub_password is defined and dockerhub_password|length > 0"
-    fail_msg: "'dockerhub_username' or 'dockerhub_password' vars is empty"
-
 # It's safe to ignore no-log-password because we're removing the password from
 # the output with the loop_control property.
 - name: Manage Docker registry login credentials
