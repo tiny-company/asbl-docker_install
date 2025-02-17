@@ -25,7 +25,7 @@
   tags: [_install_docker_rootful]
   when: docker_rootfull
 
-## docker rootless
+## docker rootless (WIP)
 # - name: Install and configure rootless Docker
 #   ansible.builtin.import_tasks:
 #     file: _docker_install_rootless.yml

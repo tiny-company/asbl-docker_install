@@ -1,5 +1,5 @@
 ---
-# Description : install docker in rootless mode
+# Description : install docker in rootful mode
 # file : _docker_install_rootful.yml
 # from : https://docs.docker.com/engine/install/debian/
 

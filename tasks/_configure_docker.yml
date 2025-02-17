@@ -1,6 +1,6 @@
 ---
-# Description : configure docker service in rootless mode
-# file : _docker_rootfull_srv.yml
+# Description : set docker daemon configuration
+# file : _configure_docker.yml
 # from : https://github.com/mullholland/ansible-role-docker/blob/main/tasks/configure.yml
 # from : https://github.com/nickjj/ansible-docker/blob/master/tasks/main.yml
 
@@ -24,28 +24,10 @@
     validate: dockerd --validate --config-file %s
   notify: ["restart docker"]
 
-- name: Configure Docker daemon options (flags)
+- name: Configure Docker systemd options (flags, env var, ..)
   ansible.builtin.template:
     src: "etc/systemd/system/docker.service.d/options.conf.j2"
     dest: "/etc/systemd/system/docker.service.d/options.conf"
-    owner: "{{ root_user }}"
-    group: "{{ root_user }}"
-    mode: "0644"
-  notify: ["Reload systemd daemon", "restart docker"]
-
-- name: Configure Docker daemon environment variables
-  ansible.builtin.template:
-    src: "etc/systemd/system/docker.service.d/environment.conf.j2"
-    dest: "/etc/systemd/system/docker.service.d/environment.conf"
-    owner: "{{ root_user }}"
-    group: "{{ root_user }}"
-    mode: "0644"
-  notify: ["Reload systemd daemon", "restart docker"]
-
-- name: Configure custom systemd unit file override
-  ansible.builtin.template:
-    src: "etc/systemd/system/docker.service.d/custom.conf.j2"
-    dest: "/etc/systemd/system/docker.service.d/custom.conf"
     owner: "{{ root_user }}"
     group: "{{ root_user }}"
     mode: "0644"

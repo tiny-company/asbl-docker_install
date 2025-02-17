@@ -1,4 +1,36 @@
 # {{ ansible_managed }}
 
+[Unit]
+Description=Docker Application Container Engine
+Documentation=https://docs.docker.com
+After=network-online.target docker.socket firewalld.service containerd.service time-set.target
+Wants=network-online.target containerd.service
+Requires=docker.socket
+
+
 [Service]
+Type=notify
+{% if docker_daemon_environment is defined %}
+{% for env in docker_daemon_environment %}
+Environment="{{ env }}"
+{% endfor %}
+{% endif %}
+{% if docker_daemon_flags is defined %}
 ExecStart=/usr/bin/dockerd {{ docker_daemon_flags | join(" ") }}
+ExecReload=/bin/kill -s HUP $MAINPID
+TimeoutSec=0
+RestartSec=2
+Restart=always
+StartLimitBurst=3
+StartLimitInterval=60s
+LimitNOFILE=infinity
+LimitNPROC=infinity
+LimitCORE=infinity
+TasksMax=infinity
+Delegate=yes
+KillMode=process
+OOMScoreAdjust=-500
+{% endif %}
+
+[Install]
+WantedBy=multi-user.target
