@@ -2,11 +2,10 @@
 
 [Unit]
 Description=Docker Application Container Engine
-Documentation=https://docs.docker.com
+Documentation="https://docs.docker.com"
 After=network-online.target docker.socket firewalld.service containerd.service time-set.target
 Wants=network-online.target containerd.service
 Requires=docker.socket
-
 
 [Service]
 Type=notify
@@ -16,6 +15,7 @@ Environment="{{ env }}"
 {% endfor %}
 {% endif %}
 {% if docker_daemon_flags is defined %}
+ExecStart=
 ExecStart=/usr/bin/dockerd {{ docker_daemon_flags | join(" ") }}
 ExecReload=/bin/kill -s HUP $MAINPID
 TimeoutSec=0
