@@ -4,7 +4,6 @@
 # source : https://docs.ansible.com/ansible/latest/collections/community/docker/docker_login_module.html
 # from : https://github.com/nickjj/ansible-docker/blob/master/tasks/main.yml
 
-
 - name: Restart Docker now to make sure `docker login` works
   ansible.builtin.meta: "flush_handlers"
 
