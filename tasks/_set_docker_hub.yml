@@ -4,8 +4,10 @@
 # source : https://docs.ansible.com/ansible/latest/collections/community/docker/docker_login_module.html
 # from : https://github.com/nickjj/ansible-docker/blob/master/tasks/main.yml
 
-# It's safe to ignore no-log-password because we're removing the password from
-# the output with the loop_control property.
+
+- name: Restart Docker now to make sure `docker login` works
+  ansible.builtin.meta: "flush_handlers"
+
 - name: Manage Docker registry login credentials
   community.docker.docker_login:
     registry_url: "{{ item.registry_url | d(omit) }}"
