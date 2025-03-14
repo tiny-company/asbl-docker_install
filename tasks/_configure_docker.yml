@@ -26,10 +26,22 @@
 
 - name: Enable service docker and ensure it is not masked
   ansible.builtin.systemd_service:
-    name: docker
+    name: "{{ item }}"
     enabled: true
     masked: no
   notify: ["Reload systemd daemon"]
+  loop:
+    - docker.service
+    - docker.socket
+
+- name: Enable service docker and ensure it is not masked
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    state: started
+  notify: ["Reload systemd daemon"]
+  loop:
+    - docker.service
+    - docker.socket
 
 - name: Configure Docker systemd options (flags, env var, ..)
   ansible.builtin.template:
