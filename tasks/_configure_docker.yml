@@ -24,6 +24,13 @@
     validate: dockerd --validate --config-file %s
   notify: ["restart docker"]
 
+- name: Enable service docker and ensure it is not masked
+  ansible.builtin.systemd_service:
+    name: docker
+    enabled: true
+    masked: no
+notify: ["Reload systemd daemon"]
+
 - name: Configure Docker systemd options (flags, env var, ..)
   ansible.builtin.template:
     src: "etc/systemd/system/docker.service.d/options.conf.j2"
@@ -33,8 +40,3 @@
     mode: "0644"
   notify: ["Reload systemd daemon", "restart docker"]
 
-- name: Enable service docker and ensure it is not masked
-  ansible.builtin.systemd_service:
-    name: docker
-    enabled: true
-    masked: no
