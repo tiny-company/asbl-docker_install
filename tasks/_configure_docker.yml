@@ -29,7 +29,7 @@
     name: docker
     enabled: true
     masked: no
-notify: ["Reload systemd daemon"]
+  notify: ["Reload systemd daemon"]
 
 - name: Configure Docker systemd options (flags, env var, ..)
   ansible.builtin.template:
