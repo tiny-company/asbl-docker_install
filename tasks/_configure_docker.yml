@@ -8,8 +8,8 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: "directory"
-    owner: "{{ root_username }}"
-    group: "{{ root_username }}"
+    owner: root
+    group: root
     mode: "0755"
   loop: "{{ docker_opts_path }}"
 
@@ -18,8 +18,8 @@
     src: "etc/docker/daemon.json.j2"
     dest: "/etc/docker/daemon.json"
     backup: true
-    owner: "{{ root_username }}"
-    group: "{{ root_username }}"
+    owner: root
+    group: root
     mode: "0644"
     validate: dockerd --validate --config-file %s
   notify: ["restart docker"]
@@ -47,8 +47,8 @@
   ansible.builtin.template:
     src: "etc/systemd/system/docker.service.d/options.conf.j2"
     dest: "/etc/systemd/system/docker.service.d/options.conf"
-    owner: "{{ root_username }}"
-    group: "{{ root_username }}"
+    owner: root
+    group: root
     mode: "0644"
   notify: ["Reload systemd daemon", "restart docker"]
 

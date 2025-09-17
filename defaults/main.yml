@@ -4,11 +4,8 @@
 ## docker_install role vars
 ###################################################
 
-## root username (default is root)
-root_user: root
-
 ## user to run this playbook
-docker_install_user: admin
+docker_install_user: root
 
 ## ==================
 ## remove obsolete docker package
