@@ -5,13 +5,13 @@
 ## delete old obsoletes packages
 - import_tasks: _remove_obsolete_docker.yml
   become: true
-  become_user: "{{ root_user }}"
+  become_user: "{{ root_username }}"
   tags: [_remove_obsolete_docker]
   when: docker_set_dockerhub
 
 - name: Creates docker data root path
   become: true
-  become_user: "{{ root_user }}"
+  become_user: "{{ root_username }}"
   ansible.builtin.file:
     path: "{{ docker_data_root }}"
     state: directory
@@ -19,7 +19,7 @@
 ## docker rootfull
 - name: Install and configure rootful Docker
   become: true
-  become_user: "{{ root_user }}"
+  become_user: "{{ root_username }}"
   ansible.builtin.import_tasks:
     file: _install_docker_rootful.yml
   tags: [_install_docker_rootful]
@@ -40,7 +40,7 @@
 # create docker user
 - name: configure docker user and group
   become: true
-  become_user: "{{ root_user }}"
+  become_user: "{{ root_username }}"
   ansible.builtin.import_tasks:
     file: _user_docker_configuration.yml
   tags: [_user_docker_configuration]
@@ -48,7 +48,7 @@
 # configure docker
 - name: configure docker daemon
   become: true
-  become_user: "{{ root_user }}"
+  become_user: "{{ root_username }}"
   ansible.builtin.import_tasks:
     file: _configure_docker.yml
   tags: [_configure_docker]
