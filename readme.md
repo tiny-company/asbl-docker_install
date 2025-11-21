@@ -4,7 +4,7 @@
 
 This repo contain the ansible role that configure docker and docker-compose for the servers.
 - install docker (rootless or rootfull) and docker compose (docker compose version 1 or 2).
-- install docker pip package to be compatible with ansible's docker module.
+- install docker pip package to be compatible with ansible's docker module (ansible use python's docker module)
 - Manage user and group related to docker.
 - Configure docker daemon.
 

@@ -1,5 +1,5 @@
 ---
-# Description : configure docker service in rootless mode
+# Description : configure docker python module (for ansible usage)
 # file : _configure_python_docker.yml
 # from : https://github.com/nickjj/ansible-docker/blob/master/tasks/main.yml
 
