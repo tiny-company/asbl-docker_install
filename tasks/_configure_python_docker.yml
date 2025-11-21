@@ -6,7 +6,7 @@
 - name: Install Python packages
   ansible.builtin.pip:
     name: >
-      {{ item.name }}{% if item.version %}=={{ item.version }}{% endif %}
+      {{ item.name }}{% if item.version is defined %}=={{ item.version }}{% endif %}
     virtualenv: "{{ docker_pip_virtualenv }}"
     virtualenv_python: "python3"
     state: "{{ item.state | d('present') }}"
