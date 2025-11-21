@@ -11,7 +11,7 @@
     virtualenv_python: "python3"
     state: "{{ item.state | d('present') }}"
   loop: "{{ docker_default_pip_packages + docker_pip_packages }}"
-  when: item.name | d()
+  when: item.name is defined
 
 - name: Create python3-docker proxy script to access Virtualenv's interpreter
   become: true
@@ -34,4 +34,4 @@
   loop: "{{ docker_default_pip_packages + docker_pip_packages }}"
   when:
     - item.state | d("present") != "absent"
-    - item.path | d() and item.src | d()
+    - item.path is defined and item.src is defined
