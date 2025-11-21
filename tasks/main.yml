@@ -7,7 +7,7 @@
   become: true
   become_user: root
   tags: [_remove_obsolete_docker]
-  when: docker_set_dockerhub
+  when: docker_packages_obsolete_remove
 
 - name: Creates docker data root path
   become: true
@@ -53,10 +53,12 @@
     file: _configure_docker.yml
   tags: [_configure_docker]
 
-# configure dockerhub ids
-- import_tasks: _set_docker_hub.yml
-  tags: [_set_docker_hub]
-  when: docker_set_dockerhub
+# configure docker registries ids
+- import_tasks: _set_docker_registry.yml
+  become: true
+  become_user: root
+  tags: [_set_docker_registry]
+  when: docker_set_registries
 
 # setting docker cron job
 - import_tasks: _set_docker_cronjob.yml

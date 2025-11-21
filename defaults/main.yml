@@ -16,6 +16,7 @@ docker_packages_obsolete_list:
   - containerd
   - runc
   - docker-doc
+docker_packages_obsolete_remove: true
 
 ## ==================
 ## set docker root data dir
@@ -115,7 +116,7 @@ docker_daemon_json: ""
 
 ## ==================
 ## dockerhub / registry vars
-docker_set_dockerhub: false
+docker_set_registries: false
 docker_registries: []
   # - registry_url: "https://index.docker.io/v1/"
   #   username: ""
