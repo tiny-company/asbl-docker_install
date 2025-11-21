@@ -3,6 +3,14 @@
 # file : _configure_python_docker.yml
 # from : https://github.com/nickjj/ansible-docker/blob/master/tasks/main.yml
 
+- name: Install python pip dependencies packages for docker
+  become: true
+  become_user: root
+  import_role:
+    name: apt_packages_install
+  vars:
+    apt_source_package_list: "{{ docker_pip_depencendies_packages }}"
+
 - name: Install Python packages
   ansible.builtin.pip:
     name: >
@@ -10,7 +18,7 @@
     virtualenv: "{{ docker_pip_virtualenv }}"
     virtualenv_python: "python3"
     state: "{{ item.state | d('present') }}"
-  loop: "{{ docker_default_pip_packages + docker_pip_packages }}"
+  loop: "{{ docker_default_pip_packages }}"
   when: item.name is defined
 
 - name: Create python3-docker proxy script to access Virtualenv's interpreter
@@ -31,7 +39,7 @@
     src: "{{ item.src }}"
     force: true
     state: "link"
-  loop: "{{ docker_default_pip_packages + docker_pip_packages }}"
+  loop: "{{ docker_default_pip_packages }}"
   when:
     - item.state | d("present") != "absent"
     - item.path is defined and item.src is defined
