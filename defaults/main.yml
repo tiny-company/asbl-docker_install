@@ -67,6 +67,12 @@ docker_packages_list:
 ## docker-compose package installation
 docker_compose_version: ""
 docker_compose_v2_version: ""
+docker_pip_depencendies_packages:
+  - gcc
+  - python3-setuptools
+  - python3-dev
+  - python3-pip
+  - virtualenv
 
 ## ==================
 ## docker pip configuration
@@ -80,15 +86,8 @@ docker_default_pip_packages:
     src: "{{ docker_pip_virtualenv + '/bin/docker-compose' }}"
     state: "{{ docker_pip_docker_compose_state }}"
 
-docker_pip_packages:
-  - "gcc"
-  - "python3-setuptools"
-  - "python3-dev"
-  - "python3-pip"
-  - "virtualenv"
-
-# docker_pip_docker_state: "present"
-# docker_pip_docker_compose_state: "absent"
+docker_pip_docker_state: "present"
+docker_pip_docker_compose_state: "absent"
 
 ## ==================
 ## docker user creation
