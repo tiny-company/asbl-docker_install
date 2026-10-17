@@ -52,6 +52,10 @@
   vars:
     apt_sources: "{{ _docker_apt_sources_merged }}"
 
+## force flush now so the Docker apt source is actually queryable before the next task
+- name: Flush handlers so the apt cache reflects the Docker source just added
+  ansible.builtin.meta: flush_handlers
+
 - name: Install Docker and Docker Compose v2
   ansible.builtin.include_role:
     name: apt_packages_install
