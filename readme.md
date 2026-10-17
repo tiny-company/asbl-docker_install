@@ -8,6 +8,12 @@ This repo contain the ansible role that configure docker and docker-compose for 
 - Manage user and group related to docker.
 - Configure docker daemon.
 
+## Supported OS
+
+This role targets **Debian 13 (trixie)** only. The role asserts the
+target host distribution and major version at the start of execution
+and fails early on any other OS or version.
+
 ## Prerequisite
 
 - None

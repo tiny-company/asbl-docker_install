@@ -39,10 +39,17 @@
   vars:
     apt_source_package_list: "{{ docker_package_dependencies + docker_pip_dependencies | default([]) }}"
 
+## merge with any "apt_sources" already defined on the host so sources
+## configured outside this role are not treated as unmanaged and removed
+## by the "apt_source_configuration" role cleanup task
+- name: Configure Docker apt source repository
+  ansible.builtin.include_role:
+    name: apt_source_configuration
+  vars:
+    apt_sources: "{{ (apt_sources | default({})) | combine(docker_apt_sources) }}"
+
 - name: Install Docker and Docker Compose v2
   ansible.builtin.include_role:
     name: apt_packages_install
   vars:
-    apt_repo_key: "{{ docker_apt_repo_key }}"
-    apt_repo: "{{ docker_apt_repo }}"
     apt_source_package_list: "{{ docker_packages_list }}"

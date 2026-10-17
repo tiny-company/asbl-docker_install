@@ -36,23 +36,33 @@ docker_channel: ["stable"]
 ## see versions at : https://docs.docker.com/desktop/release-notes/
 docker_version: ""
 
-docker_apt_repo_key:
-  - {"url" : "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg", "dest" : "/etc/apt/trusted.gpg.d/docker.asc"}
-docker_apt_repo:
-  - {"url" : "deb [signed_by=/etc/apt/trusted.gpg.d/docker.asc] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} stable", "filename" : "docker-ce"}
+## apt source definition consumed by the "apt_source_configuration" role
+## see : https://github.com/tiny-company/asbl-apt_source_configuration
+docker_apt_sources:
+  docker:
+    dest: "/etc/apt/sources.list.d/docker.sources"
+    types: ["deb"]
+    uris:
+      - "https://download.docker.com/linux/{{ ansible_distribution | lower }}"
+    suites:
+      - "{{ ansible_distribution_release | lower }}"
+    components: "{{ docker_channel }}"
+    signed_by: "/usr/share/keyrings/docker-archive-keyring.gpg"
+    enabled: true
+    gpg:
+      managed: true
+      url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+      fingerprint: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
 
 docker_package_dependencies:
   - acl
-  - apt-transport-https
   - ca-certificates
   - cron
-  - software-properties-common
   - curl
   - dbus-user-session
-  - gnupg2
+  - gnupg
   - git
   - git-man
-  - libcurl3-gnutls
   - liberror-perl
   - libltdl7
   - pass
@@ -61,6 +71,7 @@ docker_packages_list:
   - docker-ce
   - docker-ce-cli
   - containerd.io
+  - docker-buildx-plugin
   - docker-ce-rootless-extras
   - docker-compose-plugin
 

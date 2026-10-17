@@ -2,6 +2,17 @@
 # Description : install and configure docker service
 # file : main.yml
 
+- name: Assert running on a supported distribution (Debian 13 / trixie)
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution == "Debian"
+      - ansible_distribution_major_version | int == 13
+    fail_msg: >
+      This role only supports Debian 13 (trixie).
+      Detected: {{ ansible_distribution }} {{ ansible_distribution_version }}.
+    success_msg: "Running on supported distribution: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+  tags: [always, _assert_supported_distribution]
+
 ## delete old obsoletes packages
 - import_tasks: _remove_obsolete_docker.yml
   become: true
