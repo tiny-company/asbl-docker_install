@@ -42,11 +42,15 @@
 ## merge with any "apt_sources" already defined on the host so sources
 ## configured outside this role are not treated as unmanaged and removed
 ## by the "apt_source_configuration" role cleanup task
+- name: Compute merged apt sources for Docker
+  ansible.builtin.set_fact:
+    _docker_apt_sources_merged: "{{ (apt_sources | default({})) | combine(docker_apt_sources) }}"
+
 - name: Configure Docker apt source repository
   ansible.builtin.include_role:
     name: apt_source_configuration
   vars:
-    apt_sources: "{{ (apt_sources | default({})) | combine(docker_apt_sources) }}"
+    apt_sources: "{{ _docker_apt_sources_merged }}"
 
 - name: Install Docker and Docker Compose v2
   ansible.builtin.include_role:
